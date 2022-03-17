@@ -1,0 +1,22 @@
+.container{
+    width: 100%;
+    height:auto;
+}
+.menu{
+  width: 100%;
+  height: 120px;
+}
+.up{
+  width: 80%;
+  height: 70px;
+  margin: 0 auto;
+}
+.up ul{
+    list-style: none;
+}
+.up ul li{
+    display: inline-block;
+}
+.up ul li a{
+   text-decoration: none;
+}
