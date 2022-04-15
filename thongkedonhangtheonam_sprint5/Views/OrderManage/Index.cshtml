@@ -1,0 +1,60 @@
+@model IEnumerable<App.Models.Product.Order>
+
+@{
+    ViewData["Title"] = "Danh sách đơn hàng";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Owner.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalPrice)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+@foreach (var item in Model) {
+    await RenderCategory(item);
+}
+    </tbody>
+</table>
+
+
+@{ 
+    async Task RenderCategory(Order item) {
+         <tr>
+            <td>
+            @Html.DisplayFor(modelItem => item.Id)
+                
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Owner.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateCreated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalPrice)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Chi tiết</a>
+                @* <a asp-action="Delete" asp-route-id="@item.Id">Xóa</a> *@
+            </td>
+        </tr>     
+    }
+}
+<partial name="_PagingXTL" model="@ViewBag.pagingModel" />
