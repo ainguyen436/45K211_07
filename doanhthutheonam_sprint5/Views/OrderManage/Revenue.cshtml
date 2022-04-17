@@ -1,0 +1,241 @@
+
+@{
+    ViewData["Title"] = "Thống kê doanh thu";
+}
+<div class="container">
+
+
+<h1>Thống kê doanh thu</h1>
+
+<input class="form-control mb-3" data-provide="datepicker" id="datepickermonth" placeholder="Thống kê theo năm"></input>
+
+
+
+
+@* <p>Date: <input type="text" class="form-control" id="datepicker"></p> *@
+@* <p>Month: <input type="text" class="form-control" id="datepickermonth"></p> *@
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+               ID hóa đơn
+            </th>
+            <th>
+                Người mua
+            </th>
+            <th>
+                Ngày tạo
+            </th>
+            <th>
+                Thành tiền
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="tblOrder">
+    </tbody>
+    <thead>
+        <tr>
+            <th>
+               Tổng tiền
+            </th>
+            <th>
+                
+            </th>
+            <th>
+               
+            </th>
+            <th id="summary">
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+</table>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+    @* <partial name="_ValidationScriptsPartial"/>
+    
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script> *@
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.2.0/css/datepicker.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.2.0/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(function() {
+            $("#datepicker").datepicker({
+                format: "mm",
+                startView: "months", 
+                minViewMode: "months"
+            }).on('changeDate',function (ev){
+                console.log(ev.date.getMonth());
+                console.log(ev.date.getFullYear());
+                loadDsmonth(ev.date.getFullYear(),ev.date.getMonth()+1);
+            });
+        } );
+        $(function() {
+            $("#datepickermonth").datepicker({
+                format: "yyyy",
+                viewMode: "years", 
+                minViewMode: "years",
+            }).on('changeDate',function (ev){
+                console.log(ev.date.getFullYear());
+                $('#tblOrder').empty();
+                loadDsyear(ev.date.getFullYear());
+            });
+        } );
+        $(function() {
+            $("#datepickerday").datepicker({
+ 
+            }).on('changeDate',function (ev){
+                console.log(ev.date.getDate());
+                loadDsDay(ev.date.getFullYear(),ev.date.getMonth()+1,ev.date.getDate());
+            });
+        } );
+        @* $("#datepicker").datepicker({
+
+            onSelect: function(date, instance) {
+
+                console.log(date);  
+            }
+        }); *@
+  </script>
+    <script>
+        $(document).ready(function(){
+            loadDs();
+        })
+        function loadDs(){
+            $.ajax({
+                url:'/admin/ordermanage/DsOrder',
+                type: 'get',
+                success: function(data){
+                    if (data.code==200){
+                        console.log(data);
+                        let totalPrice=0
+                        $.each(data.dsOrder,function(k,v){
+                                let tr='<tr>'
+                                tr+='<td>'+v.id+'</td>'
+                                tr+='<td>'+v.userName+'</td>'
+                                tr+='<td>'+v.dateCreated+'</td>'
+                                tr+='<td>'+v.price+'</td>'
+                                tr+='</tr>';
+                                totalPrice+=v.price
+
+                             $('#tblOrder').append(tr);
+                        });
+                            let sumaryvalue='<p>'+totalPrice+'</p>';
+                            $('#summary').empty();
+                            $('#summary').append(sumaryvalue);
+                    }
+                }
+            });
+        }
+        function loadDsyear(year1){
+            $.ajax({
+                url:'/admin/ordermanage/DsOrderyear',
+                type:'get',
+                data:{
+                    year:parseInt(year1)
+                },
+                success:function(data){
+                    if (data.code==200){
+                    $('#tblOrder').empty();
+                    let totalPrice=0
+                    $.each(data.dsOrder,function(k,v){
+                                let tr='<tr>'
+                                tr+='<td>'+v.id+'</td>'
+                                tr+='<td>'+v.userName+'</td>'
+                                tr+='<td>'+v.dateCreated+'</td>'
+                                tr+='<td>'+v.price+'</td>'
+                                tr+='</tr>';
+                                totalPrice+=v.price
+
+                             $('#tblOrder').append(tr);
+                        });
+                            let sumaryvalue='<p>'+totalPrice+'</p>';
+                            $('#summary').empty();
+                            $('#summary').append(sumaryvalue);
+                    }
+                    else{
+                    }
+                }
+            });
+        }
+        function loadDsmonth(year1,month1){
+            $.ajax({
+                url:'/admin/ordermanage/dsOrderMonth',
+                type:'get',
+                data:{
+                    year:parseInt(year1),
+                    month:parseInt(month1)
+                },
+                success:function(data){
+                    if (data.code==200){
+                    let totalPrice=0
+                    $('#tblOrder').empty();
+                    $.each(data.dsOrder,function(k,v){
+                                let tr='<tr>'
+                                tr+='<td>'+v.id+'</td>'
+                                tr+='<td>'+v.userName+'</td>'
+                                tr+='<td>'+v.dateCreated+'</td>'
+                                tr+='<td>'+v.price+'</td>'
+                                tr+='</tr>';
+                                totalPrice+=v.price
+
+                             $('#tblOrder').append(tr);
+                        });
+                            let sumaryvalue='<p>'+totalPrice+'</p>';
+                            $('#summary').empty();
+                            $('#summary').append(sumaryvalue);
+                    }
+                    else{
+
+                    }
+                }
+            });
+        }
+        function loadDsDay(year1,month1,day1){
+            $.ajax({
+                url:'/admin/ordermanage/dsOrderDay',
+                type:'get',
+                data:{
+                    day:parseInt(day1),
+                    year:parseInt(year1),
+                    month:parseInt(month1)
+                },
+                success:function(data){ 
+                    if (data.code==200){
+                    let totalPrice=0
+                    $('#tblOrder').empty();
+                    $.each(data.dsOrder,function(k,v){
+                                let tr='<tr>'
+                                tr+='<td>'+v.id+'</td>'
+                                tr+='<td>'+v.userName+'</td>'
+                                tr+='<td>'+v.dateCreated+'</td>'
+                                tr+='<td>'+v.price+'</td>'
+                                tr+='</tr>';
+                                totalPrice+=v.price
+                             $('#tblOrder').append(tr);
+
+                        });
+                            let sumaryvalue='<p>'+totalPrice+'</p>';
+                            $('#summary').empty();
+                            $('#summary').append(sumaryvalue);
+                    }
+                    else{
+
+                    }
+                }
+            });
+        }
+    </script>
+
+}
+</div>
